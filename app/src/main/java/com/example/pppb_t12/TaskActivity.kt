@@ -1,9 +1,9 @@
 package com.example.pppb_t12
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.pppb_t12.databinding.ActivityTaskBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -16,6 +16,7 @@ class TaskActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityTaskBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

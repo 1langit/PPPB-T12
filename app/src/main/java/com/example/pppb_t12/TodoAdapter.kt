@@ -1,31 +1,25 @@
 package com.example.pppb_t12
 
-import android.content.Context
-import android.graphics.Color
-import android.view.GestureDetector
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pppb_t12.databinding.ActivityTaskBinding
 import com.example.pppb_t12.databinding.ItemTodoBinding
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 typealias OnClickTodo = (Todo) -> Unit
+typealias OnLongClickTodo = (Todo) -> Unit
+typealias OnClickStatus = (Todo) -> Unit
 
 class TodoAdapter(
-    private val context: Context,
     private val listTodo: List<Todo>,
     private val onClickTodo: OnClickTodo,
+    private val onLongClickTodo: OnLongClickTodo,
+    private val onClickStatus: OnClickStatus
+
 ) : RecyclerView.Adapter<TodoAdapter.ItemTodoViewHolder>() {
 
     private lateinit var binding: ActivityTaskBinding
-    val db = TodoRoomDatabase.getDatabase(context)
-    private var mTodoDao: TodoDao = db!!.todoDao()!!
-    private var executorService: ExecutorService = Executors.newSingleThreadExecutor()
 
     inner class ItemTodoViewHolder(private val binding: ItemTodoBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(data: Todo) {
@@ -35,21 +29,7 @@ class TodoAdapter(
                 txtStatus.text = data.status
 
                 icTodo.setOnClickListener {
-                    val newStatus = when(data.status) {
-                        "To do" -> "Doing"
-                        "Doing" -> "Done"
-                        "Done" -> "To do"
-                        else -> ""
-                    }
-                    update(
-                        Todo(
-                            id = data.id,
-                            title = data.title,
-                            tag = data.tag,
-                            status = newStatus,
-                            description = data.description
-                        )
-                    )
+                    onClickStatus(data)
                 }
 
                 when(data.status) {
@@ -80,8 +60,7 @@ class TodoAdapter(
             }
 
             itemView.setOnLongClickListener {
-                Toast.makeText(itemView.context, "Task deleted", Toast.LENGTH_SHORT).show()
-                delete(data)
+                onLongClickTodo(data)
                 true
             }
         }
@@ -98,17 +77,5 @@ class TodoAdapter(
 
     override fun onBindViewHolder(holder: ItemTodoViewHolder, position: Int) {
         holder.bind(listTodo[position])
-    }
-
-    private fun update(todo: Todo) {
-        executorService.execute {
-            mTodoDao.update(todo)
-        }
-    }
-
-    private fun delete(todo: Todo) {
-        executorService.execute {
-            mTodoDao.delete(todo)
-        }
     }
 }
